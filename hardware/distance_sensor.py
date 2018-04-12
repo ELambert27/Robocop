@@ -1,10 +1,26 @@
-import gopigo3
+import easygopigo3
 import time
 
-class Distance_Sensor:
-    GPG = gopigo3.GoPiGo3()
+class Distance_Sensor(object):
+    def __init__(self):
+        self.GPG = easygopigo3.EasyGoPiGo3()
+        self.servo = self.GPG.init_servo()
+        self.distance_sensor = self.GPG.init_distance_sensor()
 
+    #SERVO IS UPSIDE DOWN, GO FROM LEFT TO RIGHT
     def move_degrees(self, left, right):
-        for i in range(left, right):
-            GPG.set_servo(GPG.SERVO_1, i)
-            time.sleep(0.001)
+            self.servo.rotate_servo(right)
+            for i in range(right, left, -1):
+                self.servo.rotate_servo(i)
+                time.sleep(0.01)
+
+    def set_angle(self, angle):
+        self.servo.rotate_servo(angle)
+        time.sleep(1)
+
+    def get_distance(self):
+        return self.distance_sensor.read()
+
+    def get_distance_stream():
+        while(True):
+            yield self.distance_sensor.read()
