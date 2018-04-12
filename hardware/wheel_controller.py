@@ -3,7 +3,7 @@ from time import sleep
 
 class Wheel_Controller(object):    
     def __init__(self):
-        self.GPG = easygopigo3.EasyGoPiGo3
+        self.GPG = easygopigo3.EasyGoPiGo3()
         self.GPG.set_motor_power(self.GPG.MOTOR_LEFT, 100)
         self.GPG.set_motor_power(self.GPG.MOTOR_RIGHT, 100)
 
