@@ -1,3 +1,3 @@
-trying to make even more changes let's GOOOOOOOOOO
-making more changes to test this out
-i'mtypingintothereadmefilex Robocop
+Robocop
+This repo contains code to run a GoPiGo robot
+
