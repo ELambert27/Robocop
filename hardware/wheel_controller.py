@@ -18,16 +18,6 @@ class Wheel_Controller(object):
     def rotateLeft(self, degrees):
         self.GPG.turn_degrees(-degrees, False)
 
-    def turnLeftWheel(self, distance):
-        #self.GPG.set_motor_power(self.GPG.MOTOR_LEFT, defaultMotorPower)
-        #self.GPG.set_motor_power(self.GPG.MOTOR_RIGHT, 0)
-        self.GPG.drive_cm(distance)
-
-    def turnRightWheel(self, distance):
-        #self.GPG.set_motor_power(self.GPG.MOTOR_LEFT, 0)
-        #self.GPG.set_motor_power(self.GPG.MOTOR_RIGHT, defaultMotorPower)
-        self.GPG.drive_cm(distance)
-
     def turnBothWheels(self, degreesForward):
         self.GPG.drive_degrees(degreesForward)
 

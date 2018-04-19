@@ -16,6 +16,9 @@ class Distance_Sensor(object):
         # The servo can go from 0 - 180 degrees, but has an offset of 15 degrees in relation to the robot's frame of reference
         self.degrees_offset = 15
 
+        # Set the servo to 90 degrees
+        self.set_angle(90)
+
     
     #SERVO IS UPSIDE DOWN, GO FROM LEFT TO RIGHT
     def sweep(self, left, right):

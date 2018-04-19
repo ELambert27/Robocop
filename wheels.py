@@ -1,5 +1,9 @@
 from hardware import Wheel_Controller
+import easygopigo3
 
-wh = Wheel_Controller()
+GPG = easygopigo3.EasyGoPiGo3()
 
-wh.turnBothWheels(100)
+wh = Wheel_Controller(GPG)
+
+wh.move_cm(1000)
+

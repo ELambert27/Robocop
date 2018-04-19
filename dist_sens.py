@@ -1,8 +1,11 @@
 from hardware import Distance_Sensor
+from hardware import Wheel_Controller
+import easygopigo3
+gpg = easygopigo3.EasyGoPiGo3()
+ds = Distance_Sensor(gpg)
+wc = Wheel_Controller(gpg)
 
-ds = Distance_Sensor()
-print(ds.get_distance())
-ds.set_angle(0)
-#ds.move_degrees(90, 90)
+while(ds.get_distance() > 4):
+    wc.move_cm(2)
 
-ds.move_degrees(0, 180)
+wc.rotateLeft(90)
