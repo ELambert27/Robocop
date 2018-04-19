@@ -4,8 +4,8 @@ import easygopigo3
 gpg = easygopigo3.EasyGoPiGo3()
 ds = Distance_Sensor(gpg)
 wc = Wheel_Controller(gpg)
+ar = ds.sweep(0, 180, 90)
 
-while(ds.get_distance() > 4):
-    wc.move_cm(2)
+if(ar[1] >= 28):
+    wc.move_cm(28)
 
-wc.rotateLeft(90)

@@ -26,6 +26,18 @@ class Distance_Sensor(object):
                 self.set_angle(i)
                 time.sleep(0.01)
 
+    #SERVO IS UPSIDE DOWN, GO FROM LEFT TO RIGHT
+    def sweep(self, left, right, inc):
+        right += 1
+        ret = []
+        print(range(right, left, -inc))
+        for i in range(right, left, -inc):
+            self.set_angle(i)
+            time.sleep(0.5)
+            ret.append(self.get_distance())
+
+        return ret
+
     def set_angle(self, angle):
         # Take into account the degree offset
         if (angle > (180 - self.degrees_offset)):

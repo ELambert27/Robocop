@@ -5,5 +5,4 @@ GPG = easygopigo3.EasyGoPiGo3()
 
 wh = Wheel_Controller(GPG)
 
-wh.move_cm(1000)
-
+wh.move_cm(100)
