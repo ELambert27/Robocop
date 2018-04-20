@@ -1,5 +1,6 @@
 import easygopigo3
 from time import sleep
+from hardware import Distance_Sensor
 
 defaultSpeed = 50 
 #speed is measured in degrees per second
@@ -9,6 +10,7 @@ defaultMotorPowerRight = 50.0000001
 class Wheel_Controller(object):    
     def __init__(self, gpg3):
         self.GPG = gpg3
+        self.DS = Distance_Sensor(self.GPG)
         #self.GPG.set_speed(defaultSpeed)
         #self.GPG.set_motor_power(self.GPG.MOTOR_LEFT, defaultMotorPowerLeft)
         #self.GPG.set_motor_power(self.GPG.MOTOR_RIGHT, defaultMotorPowerRight)
