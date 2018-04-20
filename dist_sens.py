@@ -10,9 +10,11 @@ ds = Distance_Sensor(gpg)
 wc = Wheel_Controller(gpg)
 
 def move_and_correct(distance):
+    print("--running move_and_correct--")
     ds.set_angle(180)
     time.sleep(1)
     firstReading = ds.get_distance()
+    print("first reading", firstReading)
     ds.set_angle(90)
     time.sleep(1)
     forwardDistance = ds.get_distance()
@@ -24,15 +26,29 @@ def move_and_correct(distance):
     ds.set_angle(180)
     time.sleep(1)
     secondReading = ds.get_distance()
-    if abs(secondReading - firstReading) > .25 and abs(secondReading - firstReading) < forwardDistance:
-        angleInRadians = math.asin(abs(secondReading - firstReading)/forwardDistance)
+    print("second reading", secondReading)
+    if abs(secondReading - firstReading) > .25 and abs(secondReading - firstReading) < 10  and forwardDistance != 0:
+        angleInRadians = math.atan(secondReading / (forwardDistance + (-forwardDistance * firstReading)/(firstReading - secondReading)))
         angleInDegrees = angleInRadians * 180 / math.pi
+        print("angle is", angleInDegrees)
         wc.move_cm(-forwardDistance)
         if secondReading > firstReading:
             wc.rotateLeft(angleInDegrees)
         else:
-            wc.rotateRight(angleInDegrees)
+            wc.rotateLeft(angleInDegrees)
         wc.move_cm(forwardDistance)
+    ds.set_angle(180)
+    time.sleep(1)
+    afterMoveReadingLeft = ds.get_distance()
+    ds.set_angle(0)
+    time.sleep(1)
+    afterMoveReadingRight = ds.get_distance()
+    if afterMoveReadingLeft > 15 or afterMoveReadingLeft < 13:
+        print("left reads off center")
+    if abs(afterMoveReadingRight - afterMoveReadingLeft) > 1:
+        print("hey the difference between the side readings is too big")
+    print("----")
+    
 
 def move():
     move_and_correct(14)
