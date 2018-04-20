@@ -14,10 +14,21 @@ class Wheel_Controller(object):
         #self.GPG.set_motor_power(self.GPG.MOTOR_RIGHT, defaultMotorPowerRight)
 
     def rotateRight(self, degrees):
-        self.GPG.turn_degrees(degrees, False)
+        self.TO_TURN = degrees
+        if self.TO_TURN >= 180:
+            self.TO_TURN = self.TO_TURN + 5
+        if self.TO_TURN >= 360:
+            self.TO_TURN = self.TO_TURN + 5
+        print(self.TO_TURN)
+        self.GPG.turn_degrees(self.TO_TURN, True)
         
     def rotateLeft(self, degrees):
-        self.GPG.turn_degrees(-degrees, False)
+        self.TO_TURN = degrees
+        if self.TO_TURN >= 180:
+            self.TO_TURN = self.TO_TURN + 5
+        if self.TO_TURN >= 360:
+            self.TO_TURN = self.TO_TURN + 5
+        self.GPG.turn_degrees(-self.TO_TURN, True)
 
     def turnBothWheels(self, degreesForward):
         self.GPG.drive_degrees(degreesForward)
