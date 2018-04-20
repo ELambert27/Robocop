@@ -10,44 +10,68 @@ ds = Distance_Sensor(gpg)
 wc = Wheel_Controller(gpg)
 
 def move_and_correct(distance):
+    
     print("--running move_and_correct--")
     ds.set_angle(180)
     time.sleep(1)
     firstReading = ds.get_distance()
-    print("first reading", firstReading)
+    print("first reading:", firstReading)
     ds.set_angle(90)
     time.sleep(1)
     forwardDistance = ds.get_distance()
+    
     if forwardDistance < distance:
         forwardDistance = forwardDistance - 2
     else:
         forwardDistance = distance
+    
+    print("forward distance:", forwardDistance)
     wc.move_cm(forwardDistance)
     ds.set_angle(180)
     time.sleep(1)
     secondReading = ds.get_distance()
-    print("second reading", secondReading)
-    if abs(secondReading - firstReading) > .25 and abs(secondReading - firstReading) < 10  and forwardDistance != 0:
-        angleInRadians = math.atan(secondReading / (forwardDistance + (-forwardDistance * firstReading)/(firstReading - secondReading)))
+    print("second reading:", secondReading)
+    if abs(secondReading - firstReading) > .25 and abs(secondReading - firstReading) < 7  and forwardDistance != 0 and (firstReading < 14 or secondReading < 14):
+        print("forwardDistance:", forwardDistance)
+        angleInRadians = math.atan(float(secondReading) / (float(forwardDistance) + (float(-forwardDistance) * float(firstReading))/(float(firstReading) - float(secondReading))))
+        print("radians:", angleInRadians)
         angleInDegrees = angleInRadians * 180 / math.pi
-        print("angle is", angleInDegrees)
+        print("angle is:", angleInDegrees)
         wc.move_cm(-forwardDistance)
         if secondReading > firstReading:
             wc.rotateLeft(angleInDegrees)
         else:
             wc.rotateLeft(angleInDegrees)
         wc.move_cm(forwardDistance)
+   
     ds.set_angle(180)
     time.sleep(1)
     afterMoveReadingLeft = ds.get_distance()
-    ds.set_angle(0)
-    time.sleep(1)
-    afterMoveReadingRight = ds.get_distance()
-    if afterMoveReadingLeft > 15 or afterMoveReadingLeft < 13:
-        print("left reads off center")
-    if abs(afterMoveReadingRight - afterMoveReadingLeft) > 1:
-        print("hey the difference between the side readings is too big")
+    print("afterMoveReadingLeft", afterMoveReadingLeft)
     print("----")
+    if afterMoveReadingLeft < 11.5:
+        offset = 14 - 2.5 - afterMoveReadingLeft
+        print("off center left:", offset)
+        wc.rotateLeft(30)
+        time.sleep(1)
+        wc.move_cm(-(offset / math.sin(math.pi/6)))
+        time.sleep(1)
+        wc.rotateRight(30)	
+        time.sleep(1)
+        wc.move_cm(offset / math.tan(math.pi/6))
+
+    if afterMoveReadingLeft > 13 and afterMoveReadingLeft < 28:
+        offset = afterMoveReadingLeft - (14 - 2.5)
+        print("off center left:", offset)
+        wc.rotateRight(30)
+        time.sleep(1)
+        wc.move_cm(-(offset / math.sin(math.pi/6)))
+        time.sleep(1)
+        wc.rotateLeft(30)
+        time.sleep(1)
+        wc.move_cm(offset / math.tan(math.pi/6))
+
+
     
 
 def move():
