@@ -9,6 +9,8 @@ ds = Distance_Sensor(gpg)
 wc = Wheel_Controller(gpg)
 
 def move():
+    wc.move_cm(14)
+
     ar = ds.sweep(0, 180, 90)
     print("Distances: " + str(ar))
     valid_choices = []
@@ -24,6 +26,7 @@ def move():
     time.sleep(3)
     if(len(valid_choices) == 0):
         print("Turning around")
+        wc.move_cm(14)
         wc.rotateLeft(180)
     else:
         choice = valid_choices[random.randint(0, len(valid_choices) - 1)]
@@ -35,11 +38,11 @@ def move():
         elif(choice == 'right'):
             wc.rotateRight(90)
 
-    wc.move_cm(14)
 
 def correct():
     ar = ds.sweep(0, 180, 15)
 
     print(ar)
 
-correct()
+while True:
+    move()
