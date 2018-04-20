@@ -17,19 +17,23 @@ class Wheel_Controller(object):
 
     def rotateRight(self, degrees):
         self.TO_TURN = degrees
-        if self.TO_TURN >= 180:
-            self.TO_TURN = self.TO_TURN + 5
+        if self.TO_TURN >= 90:
+            self.TO_TURN = self.TO_TURN + 10
+        #if self.TO_TURN >= 180:
+        #    self.TO_TURN = self.TO_TURN + 5
         if self.TO_TURN >= 360:
-            self.TO_TURN = self.TO_TURN + 5
+            self.TO_TURN = self.TO_TURN + 10
         print(self.TO_TURN)
         self.GPG.turn_degrees(self.TO_TURN, True)
         
     def rotateLeft(self, degrees):
         self.TO_TURN = degrees
-        if self.TO_TURN >= 180:
-            self.TO_TURN = self.TO_TURN + 5
+        if self.TO_TURN >= 90:
+            self.TO_TURN = self.TO_TURN + 10
+        #if self.TO_TURN >= 180:
+        #    self.TO_TURN = self.TO_TURN + 5
         if self.TO_TURN >= 360:
-            self.TO_TURN = self.TO_TURN + 5
+            self.TO_TURN = self.TO_TURN + 10
         self.GPG.turn_degrees(-self.TO_TURN, True)
 
     def turnBothWheels(self, degreesForward):
