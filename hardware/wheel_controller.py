@@ -1,5 +1,5 @@
 import easygopigo3
-from time import sleep
+import time
 from hardware import Distance_Sensor
 import random
 import math
@@ -54,7 +54,7 @@ class Wheel_Controller(object):
         firstReading = self.DS.get_distance()
         self.DS.set_angle(90)
         time.sleep(1)
-        forwardDistance = ds.get_distance()
+        forwardDistance = self.DS.get_distance()
         if forwardDistance < distance:
             forwardDistance = forwardDistance - 2
         else:
@@ -64,7 +64,7 @@ class Wheel_Controller(object):
         time.sleep(1)
         secondReading = self.DS.get_distance()
         if abs(secondReading - firstReading) > .25 and abs(secondReading - firstReading) < 7 and forwardDistance != 0 and (firstReading < 14 or secondReading < 14):
-            angleInRadians = math.atan(float(secondReading)/ (float(forwardDistance) + float(-forwardDistance) * float(firstReading))/(float(firstReading) - float(secondReading))))
+            angleInRadians = math.atan(float(secondReading)/ (float(forwardDistance) + float(-forwardDistance) * float(firstReading))/(float(firstReading) - float(secondReading)))
             angleInDegrees = angleInRadians * 180 / math.pi
             self.move_cm(-forwardDistance)
             self.rotateLeft(angleInDegrees)
