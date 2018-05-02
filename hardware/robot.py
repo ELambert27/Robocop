@@ -20,7 +20,7 @@ class robot(object):
             print("Following path: " + str(path))
             time.sleep(.25)
             self.follow_path(path)
-            
+#            input("Press enter to continue") 
 
     def move_and_correct(self, distance_threshold):
         self.ds.set_angle(180)
@@ -43,15 +43,17 @@ class robot(object):
             angle_in_rads = math.atan(float(second_dist_reading) / (float(forward_dist) + float(-forward_dist) * float(first_dist_reading)) / (float(first_dist_reading) - float(second_dist_reading)))
 
             angle_in_degrees = angle_in_rads * 180 / math.pi
-            if angle_in_degrees != 0:    
+            if angle_in_degrees > 10:    
                 self.wc.move_cm(-forward_dist)
                 self.wc.rotate_left(angle_in_degrees)
                 self.wc.move_cm(forward_dist)
 
         self.ds.set_angle(180)
         after_move_reading_left = self.ds.get_distance()
+        print("forward_dist: " + str(forward_dist))
+        print("After move reading left: " + str(after_move_reading_left))
         if after_move_reading_left < 11.5:
-            offset = forward_dist - 2.5 - after_move_reading_left
+            offset = distance_threshold - 2.5 - after_move_reading_left
             self.wc.rotate_left(30)
             time.sleep(.25)
             self.wc.move_cm(-(offset / math.sin(math.pi/6)))
@@ -59,8 +61,11 @@ class robot(object):
             self.wc.rotate_right(30)
             time.sleep(.25)
             self.wc.move_cm(offset / math.tan(math.pi/6))
-        if after_move_reading_left > 16.5 and after_move_reading_left < 28:
-            offset = after_move_reading_left + 2.5 - forward_dist
+        self.ds.set_angle(0) #0 is really 15 degrees 'cause of bad robot build
+        after_move_reading_right = self.ds.get_distance() * math.cos(math.pi/12)
+        print("After move reading right: " + str(after_move_reading_right))
+        if after_move_reading_right < 11.5:
+            offset = distance_threshold - 2.5 - after_move_reading_right
             self.wc.rotate_right(30)
             time.sleep(.25)
             self.wc.move_cm(-(offset / math.sin(math.pi/6)))
@@ -68,6 +73,15 @@ class robot(object):
             self.wc.rotate_left(30)
             time.sleep(.25)
             self.wc.move_cm(offset / math.tan(math.pi/6))
+        #if after_move_reading_left > 13 and after_move_reading_left < 28:
+        #    offset = after_move_reading_left - distance_threshold
+        #    self.wc.rotate_right(30)
+        #    time.sleep(.25)
+        #    self.wc.move_cm(-(offset / math.sin(math.pi/6)))
+        #    time.sleep(.25)
+        #    self.wc.rotate_left(30)
+        #    time.sleep(.25)
+        #    self.wc.move_cm(offset / math.tan(math.pi/6))
         return forward_dist
 
     def follow_path(self, path):
@@ -100,9 +114,9 @@ class robot(object):
             print("Moving and correcting")
             distance_moved = self.move_and_correct(14)
             time.sleep(.25)
-            if distance_moved > 13:
-                self.current_map_node.visited = True
-                self.current_map_node = node
+            #if distance_moved > 13:
+            self.current_map_node.visited = True
+            self.current_map_node = node
                         
     def turn(self, next_node):
         cur_pos = self.current_map_node.position

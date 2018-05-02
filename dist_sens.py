@@ -39,9 +39,9 @@ def move_and_correct(distance):
         print("angle is:", angleInDegrees)
         wc.move_cm(-forwardDistance)
         if secondReading > firstReading:
-            wc.rotateLeft(angleInDegrees)
+            wc.rotate_left(angleInDegrees)
         else:
-            wc.rotateLeft(angleInDegrees)
+            wc.rotate_left(angleInDegrees)
         wc.move_cm(forwardDistance)
    
     ds.set_angle(180)
@@ -52,22 +52,22 @@ def move_and_correct(distance):
     if afterMoveReadingLeft < 11.5:
         offset = 14 - 2.5 - afterMoveReadingLeft
         print("off center left:", offset)
-        wc.rotateLeft(30)
+        wc.rotate_left(30)
         time.sleep(1)
         wc.move_cm(-(offset / math.sin(math.pi/6)))
         time.sleep(1)
-        wc.rotateRight(30)	
+        wc.rotate_right(30)	
         time.sleep(1)
         wc.move_cm(offset / math.tan(math.pi/6))
 
     if afterMoveReadingLeft > 13 and afterMoveReadingLeft < 28:
         offset = afterMoveReadingLeft - (14 - 2.5)
         print("off center left:", offset)
-        wc.rotateRight(30)
+        wc.rotate_right(30)
         time.sleep(1)
         wc.move_cm(-(offset / math.sin(math.pi/6)))
         time.sleep(1)
-        wc.rotateLeft(30)
+        wc.rotate_left(30)
         time.sleep(1)
         wc.move_cm(offset / math.tan(math.pi/6))
 
@@ -113,9 +113,9 @@ def move():
         move_and_correct(14)
         time.sleep(.25)
         if(choice == 'left'):
-            wc.rotateLeft(90)
+            wc.rotate_left(90)
         elif(choice == 'right'):
-            wc.rotateRight(90)
+            wc.rotate_right(90)
 
 
 def correct():
