@@ -19,12 +19,29 @@ class Distance_Sensor(object):
         # Set the servo to 90 degrees
         self.set_angle(90)
 
-    
+        # Time to allow servo to move
+        self.sleep_time = 0.5
+
+    def get_corridor_measurements(self):
+        self.set_angle(180)
+        time.sleep(.1)
+        left  = self.get_distance()
+
+        self.set_angle(90)
+        time.sleep(.1)
+        straight = self.get_distance()
+
+        self.set_angle(0)
+        time.sleep(.1)
+        right = self.get_distance()
+
+        return (left, straight, right)
+ 
     #SERVO IS UPSIDE DOWN, GO FROM LEFT TO RIGHT
     def sweep(self, left, right):
-            for i in range(right, left, -1):
-                self.set_angle(i)
-                time.sleep(0.01)
+        for i in range(right, left, -1):
+            self.set_angle(i)
+            time.sleep(0.01)
 
     #SERVO IS UPSIDE DOWN, GO FROM LEFT TO RIGHT
     def sweep(self, left, right, inc):
@@ -33,7 +50,7 @@ class Distance_Sensor(object):
         print(range(right, left, -inc))
         for i in range(right, left, -inc):
             self.set_angle(i)
-            time.sleep(0.5)
+            time.sleep(0.1)
             ret.append(self.get_distance())
 
         return ret
@@ -45,7 +62,9 @@ class Distance_Sensor(object):
         else:
             angle = angle - self.degrees_offset
 
+        # Set the servo angle, and wait 
         self.servo.rotate_servo(angle)
+        time.sleep(0.25)
 
     def get_distance(self):
         return self.distance_sensor.read()

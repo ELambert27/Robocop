@@ -1,93 +1,87 @@
-from hardware import NORTH, SOUTH, WEST, EAST
-
-class MapA(object):
-    def __init__(self):
+from hardware import *
+import time
+class Map(object):
+    def __init__(self, cur_node):
         self.grid_map = {}
-        self.current_position = (1,1)    
-        self.orientation = NORTH
-        # self.grid_map[self.current_position] = map_node()
+        self.grid_map[cur_node.position] = cur_node
 
-    def set_node(self, position, dire):
-        self.current_position.add_child(map_node, dire)
+    def set_node(self, map_node):
+        self.grid_map[map_node.position] = map_node
+
+    def get_node(self, pos):
+        return self.grid_map[pos]
+
+    def find_path(self, cur_node, checked=[]):
+        print("At current node: " + str(cur_node))
+        checked.append(cur_node.position)
+        print(checked)
+        time.sleep(0.01)
+        for node in cur_node.cardinal_available:
+            if(node in checked):
+                print("We in here")
+                continue
+            try:
+                next_node = self.grid_map[node]
+            except:
+                continue
+            
+
+            if(next_node.visited == False):
+                print(str(next_node) + " has not been visited yet :)")
+                return [next_node]
+            else:
+                return [cur_node].extend(self.find_path(next_node, checked))
+
+        return []
 
     def analyze(self, dist_sensor):
         valid_moves = dist_sensor.get_possible_movements()
 
     def print(self):
         print(self.grid_map)
-        print(self.current_position)
         print(self.orientation)
         
-class MapNode():
-    def __init__(self, pos):
-        self.northAvailable = False
-        self.northTraveled = False
-        self.eastAvailable = False
-        self.eastTraveled = False
-        self.southAvailable = False
-        self.southTraveled = False
-        self.westAvailable = False
-        self.westTraveled = False
+class Map_Node():
 
-    def set_available(self, orientation, direction):
-        if orientation == NORTH:
-            if direction == 'left':
-                self.westAvailable = True
-            elif direction == 'straight':
-                self.northAvailable = True
-            elif direction == 'right':
-                self.eastAvailable = True
-        elif orientation == EAST:
-            if direction == 'left':
-                self.northAvailable = True
-            elif direction == 'straight':
-                self.eastAvailable = True
-            elif direction == 'right':
-                self.southAvailable = True
-        elif orientation == SOUTH:
-            if direction == 'left':
-                self.eastAvailable = True
-            elif direction == 'straight':
-                self.southAvailable = True
-            elif direction == 'right':
-                self.westAvailable = True
-        elif orientation == WEST:
-            if direction == 'left':
-                self.southAvailable = True
-            elif direction == 'straight':
-                self.westAvailable = True
-            elif direction == 'right':
-                self.northAvailable = True
+    #This one should be used :)
+    def __init__(self, pos, parent_node=None):
+        if(parent_node == None):
+            self.position = pos
+            #NORTH, EAST, SOUTH, WEST
+            self.cardinal_available = [None, None, None, None]
+            self.visited = True
 
-    def get_neighbors(self, orientation):
-        toreturn = []
-        if orientation == NORTH:
-            if self.westAvailable:
-                toreturn.append('left')
-            if self.northAvailable:
-                toreturn.append('straight')
-            if self.eastAvailable:
-                toreturn.append('right')
-        elif orientation == EAST:
-            if self.northAvailable:
-                toreturn.append('left')
-            if self.eastAvailable:
-                toreturn.append('straight')
-            if self.southAvailable:
-                toreturn.append('right')
-        elif orientation == SOUTH:
-            if self.eastAvailable:
-                toreturn.append('left')
-            if self.southAvailable:
-                toreturn.append('straight')
-            if self.westAvailable:
-                toreturn.append('right')
-        else: #orientation == WEST, presumably
-            if self.southAvailable:
-                toreturn.append('left')
-            if self.westAvailable:
-                toreturn.append('straight')
-            if self.northAvailable:
-                toreturn.append('right')
-        return toreturn
+        else:
+            self.position = pos
+            self.cardinal_available = [None, None, None, None]
 
+            p_pos = parent_node.position
+
+            #If x is greater, we are going EAST
+            if(pos[0] > p_pos[0]):
+                self.cardinal_available[WEST] = p_pos
+
+            #If x is less, we are going WEST
+            elif(pos[0] < p_pos[0]):
+                self.cardinal_available[EAST] = p_pos
+
+            #If y is greater, we are going NORTH
+            elif(pos[1] > p_pos[1]):
+                self.cardinal_available[SOUTH] = p_pos
+            
+            #If y is less than, we are going SOUTH
+            elif(pos[1] < p_pos[1]):
+                self.cardinal_available[NORTH] = p_pos
+
+            self.visited = False
+
+    def __repr__(self):
+        #return "Node <", self.northAvailable, self.northTraveled, self.eastAvailable, self.eastTraveled, self.southAvailable, self.southTraveled, self.westAvailable, self.westTraveled, ">"
+        return str(self.position)
+
+    def __eq__(self, other):
+        return isinstance(other, Map_Node) and self.position == other.position
+
+    def __hash__(self):
+        print("GAAAH")
+        return hash(self.position)
