@@ -8,19 +8,129 @@ class robot(object):
         self.wc = Wheel_Controller(self.gpg)
         self.ds = Distance_Sensor(self.gpg)
         self.orientation = NORTH
-        self.current_map_node = Map_Node((0,0))
-        self.maze_map = Map(self.current_map_node)
-        self.unvisited_nodes = set()
+        self.position = (0,0)
+        self.map = Map()
+        self.map.add_node_basic(self.position)                
+        self.location_stack = []
 
     def go(self):
-        self.move_and_correct(14)
-        while(True):
-            self.update_map()
-            path = self.maze_map.find_path(self.current_map_node)
-            print("Following path: " + str(path))
-            time.sleep(.25)
-            self.follow_path(path)
-#            input("Press enter to continue") 
+        flag = True
+        while flag:
+            if self.map.nodes[self.position].is_visited != 2:
+                self.move_and_correct(14)
+                available_directions = self.ds.get_valid_directions()
+                new_node = self.map.add_node(self.position, self.orientation)
+                available_directions = self.remove_extra_directions(available_directions)
+                self.map.nodes[new_node].available_directions = available_directions
+                self.move_and_correct(14)
+                self.position = new_node
+                self.map.nodes[self.position].is_visited = 1
+                self.location_stack.append(self.position)
+                if len(available_directions) == 0:
+                    self.wc.rotate_left(180)
+                    self.orientation = (self.orientation - 2) % 4
+                    self.map.nodes[self.position].is_visited = 2
+                else:
+                    next_direction = available_directions[0]
+                    if next_direction == 'left':
+                        self.wc.rotate_left(90)
+                        self.orientation = (self.orientation - 1) % 4
+                    elif next_direction == 'right':
+                        self.wc.rotate_right(90)
+                        self.orientation = (self.orientation + 1) % 4
+            else:
+                previous_node = self.location_stack.pop()
+                if len(self.location_stack) == 0:
+                    print("We're done")
+                    flag = False
+                else:
+                    even_previous_node = self.location_stack[len(self.location_stack) - 1]
+                    self.turn(previous_node, even_previous_node)
+                    self.move_and_correct(14)
+                    self.move_and_correct(14)
+                    self.position = even_previous_node
+    
+    def remove_extra_directions(self, available_directions):
+        if self.orientation == NORTH:
+            try:
+                available_directions['left']
+                if self.map.nodes[(self.position[0] - 1, self.position[1] + 1)].is_visited > 0:
+                    available_directions.remove('left')
+            except:
+                print('')
+            try:
+                available_directions['straight']
+                if self.map.nodes[(self.position[0], self.position[1] + 2)].is_visited > 0:
+                    available_directions.remove('straight')
+            except:                                                                                                  
+                print('')
+            try:
+                available_directions['right']
+                if self.map.nodes[(self.position[0] + 1, self.position[1] + 1)].is_visited > 0:
+                    available_directions.remove('right')
+            except:                                                                                                              
+                print('')
+        if self.orientation == EAST:
+            try:
+                available_directions['left']
+                if self.map.nodes[(self.position[0] + 1, self.position[1] + 1)].is_visited > 0:
+                    available_directions.remove('left')
+            except:
+                print('')
+            try:
+                available_directions['straight']
+                if self.map.nodes[(self.position[0] + 2, self.position[1])].is_visited > 0:
+                    available_directions.remove('straight')
+            except:
+                print('')
+            try:
+                available_directions['right']
+                if self.map.nodes[(self.position[0] + 1, self.position[1] - 1)].is_visited > 0:
+                    available_directions.remove('right')
+            except:
+                print('')
+
+        if self.orientation == SOUTH:
+            try:
+                available_directions['left']
+                if self.map.nodes[(self.position[0] + 1, self.position[1] - 1)].is_visited > 0:
+                    available_directions.remove('left')
+            except:
+                print('')
+            try:
+                available_directions['straight']
+                if self.map.nodes[(self.position[0], self.position[1] - 2)].is_visited > 0:
+                    available_directions.remove('straight')
+            except:
+                print('')
+            try:
+                available_directions['right']
+                if self.map.nodes[(self.position[0] - 1, self.position[1] - 1)].is_visited > 0:
+                    available_directions.remove('right')
+            except:
+                print('')			
+		
+        if self.orientation == WEST:
+            try:
+                available_directions['left']
+                if self.map.nodes[(self.position[0] - 1, self.position[1] - 1)].is_visited > 0:
+                    available_directions.remove('left')
+            except:
+                print('')
+            try:
+                available_directions['straight']
+                if self.map.nodes[(self.position[0] - 2, self.position[1])].is_visited > 0:
+                    available_directions.remove('straight')
+            except:
+                print('')
+            try:
+                available_directions['right']
+                if self.map.nodes[(self.position[0] - 1, self.position[1] + 1)].is_visited > 0:
+                    available_directions.remove('right')
+            except:
+                print('')
+
+        return available_directions
 
     def move_and_correct(self, distance_threshold):
         self.ds.set_angle(180)
@@ -29,7 +139,7 @@ class robot(object):
         self.ds.set_angle(90)
         forward_dist = self.ds.get_distance()
 
-        if(forward_dist < distance_threshold):
+        if(forward_dist < distance_threshold + 2):
             forward_dist = forward_dist - 2
         else:
             forward_dist = distance_threshold
@@ -39,14 +149,17 @@ class robot(object):
         
         second_dist_reading = self.ds.get_distance()
        
-        if abs(second_dist_reading - first_dist_reading) > .25 and abs(second_dist_reading - first_dist_reading) < 6 and forward_dist != 0 and (first_dist_reading < 14 or second_dist_reading < 14):
+        if abs(second_dist_reading - first_dist_reading) > .25 and abs(second_dist_reading - first_dist_reading) < 7 and forward_dist != 0 and (first_dist_reading < 14 or second_dist_reading < 14):
             angle_in_rads = math.atan(float(second_dist_reading) / (float(forward_dist) + float(-forward_dist) * float(first_dist_reading)) / (float(first_dist_reading) - float(second_dist_reading)))
 
             angle_in_degrees = angle_in_rads * 180 / math.pi
-            if angle_in_degrees > 10:    
+            if angle_in_degrees > 1:    
                 self.wc.move_cm(-forward_dist)
+                time.sleep(.25)
                 self.wc.rotate_left(angle_in_degrees)
+                time.sleep(.25)
                 self.wc.move_cm(forward_dist)
+                time.sleep(.25)
 
         self.ds.set_angle(180)
         after_move_reading_left = self.ds.get_distance()
@@ -73,15 +186,6 @@ class robot(object):
             self.wc.rotate_left(30)
             time.sleep(.25)
             self.wc.move_cm(offset / math.tan(math.pi/6))
-        #if after_move_reading_left > 13 and after_move_reading_left < 28:
-        #    offset = after_move_reading_left - distance_threshold
-        #    self.wc.rotate_right(30)
-        #    time.sleep(.25)
-        #    self.wc.move_cm(-(offset / math.sin(math.pi/6)))
-        #    time.sleep(.25)
-        #    self.wc.rotate_left(30)
-        #    time.sleep(.25)
-        #    self.wc.move_cm(offset / math.tan(math.pi/6))
         return forward_dist
 
     def follow_path(self, path):
@@ -94,6 +198,10 @@ class robot(object):
             self.move_and_correct(14)
             time.sleep(.25)
             self.current_map_node.visited = True
+            if self.maze_map.all_children_visited(self.current_map_node):
+                self.current_map_node.status_value = 2
+            else:
+                self.current_map_node.status_value = 1
             current_position = self.current_map_node.position
             current_position_x = current_position[0]
             current_position_y = current_position[1]
@@ -112,15 +220,18 @@ class robot(object):
             self.turn(node)
             time.sleep(.25)
             print("Moving and correcting")
-            distance_moved = self.move_and_correct(14)
+            self.move_and_correct(14)
             time.sleep(.25)
-            #if distance_moved > 13:
             self.current_map_node.visited = True
+            if self.maze_map.all_children_visited(self.current_map_node):
+                self.current_map_node.status_value = 2
+            else:
+                self.current_map_node.status_value = 1
             self.current_map_node = node
                         
-    def turn(self, next_node):
-        cur_pos = self.current_map_node.position
-        next_pos = next_node.position
+    def turn(self, previous_node, next_node):
+        cur_pos = previous_node
+        next_pos = next_node
 
         print("Current position is: " + str(cur_pos))
         print("Next positions is: " + str(next_pos))
@@ -172,7 +283,7 @@ class robot(object):
             try:
                 new_map_node = self.get_new_node(card_left)
                 new_nodes.add(new_map_node)
-                self.maze_map.set_node(new_map_node)
+                self.maze_map.add_node(new_map_node)
                 self.current_map_node.cardinal_available[card_left] = new_map_node.position
             except:
                 print("Not adding a new node because one already exists")
@@ -180,7 +291,7 @@ class robot(object):
             try:
                 new_map_node = self.get_new_node(card_straight)
                 new_nodes.add(new_map_node)
-                self.maze_map.set_node(new_map_node)
+                self.maze_map.add_node(new_map_node)
                 self.current_map_node.cardinal_available[card_straight] = new_map_node.position
             except:
                 print("Not adding a new node because one already exists")
@@ -188,7 +299,7 @@ class robot(object):
             try:
                 new_map_node = self.get_new_node(card_right)
                 new_nodes.add(new_map_node)
-                self.maze_map.set_node(new_map_node)
+                self.maze_map.add_node(new_map_node)
                 self.current_map_node.cardinal_available[card_right] = new_map_node.position
             except:
                 print("Not adding a new node because one already exists")

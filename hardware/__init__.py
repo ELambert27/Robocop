@@ -13,5 +13,5 @@ LEFT = 3
 import easygopigo3
 from hardware.distance_sensor import Distance_Sensor
 from hardware.wheel_controller import Wheel_Controller
-from hardware.mapping import Map
-from hardware.mapping import Map_Node
+from hardware.mapping_new import Map
+from hardware.mapping_new import Map_Node

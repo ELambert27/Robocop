@@ -22,6 +22,17 @@ class Distance_Sensor(object):
         # Time to allow servo to move
         self.sleep_time = 0.5
 
+    def get_valid_directions(self):
+        directions = self.get_corridor_measurements()
+        to_return = []         
+        if directions[0] > 17:
+            to_return.append('left')
+        if directions[1] > 17:
+            to_return.append('straight')
+        if directions[2] > 17:
+            to_return.append('right')
+        return to_return
+
     def get_corridor_measurements(self):
         self.set_angle(180)
         time.sleep(.1)

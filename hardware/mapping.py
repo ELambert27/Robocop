@@ -4,21 +4,13 @@ class Map(object):
     def __init__(self, cur_node):
         self.grid_map = {}
         self.grid_map[cur_node.position] = cur_node
-        self.checked = []
-        self.unchecked = []
+        self.grid_map[cur_node.position].status_value = 2
 
     def set_node(self, map_node):
         self.grid_map[map_node.position] = map_node
 
     def get_node(self, pos):
         return self.grid_map[pos]
-
-    def update_nodes(self):
-        for node in self.grid_map:
-            if self.grid_map[node].visited == True:
-                self.checked.append(node)
-            else:
-                self.unchecked.append(node)
         
     def find_path(self, cur_node, checked=[]):
         checked.append(cur_node.position)
@@ -38,23 +30,6 @@ class Map(object):
                 return [cur_node].extend(self.find_path(next_node, checked))
         return []
 
-#    def find_path(self, cur_node, recursive=False):
-#        print("At current node: " + str(cur_node))
-#        if not recursive:
-#            self.update_nodes()
-#        time.sleep(0.01)
-#        while True:
-#            try:
-#                node = self.unchecked.pop()
-#                print(node)
-#                if (self.grid_map[cur_node].position[0] - self.grid_map[node].position[0] + self.grid_map[cur_node].position[1] - self.grid_map[node].position[1]) == 1:
-#                    #i.e. this node is 1 away from the current node
-#                    return [node]
-#                else:
-#                    return [node].extend(self.find_path(node, True))
-#            except IndexError:
-#                break
-#        return []
 
     def analyze(self, dist_sensor):
         valid_moves = dist_sensor.get_possible_movements()
@@ -72,6 +47,10 @@ class Map_Node():
             #NORTH, EAST, SOUTH, WEST
             self.cardinal_available = [None, None, None, None]
             self.visited = True
+            self.status_value = 0
+                #status_value is a 0 if the node is unchecked, 1 if it's been passed through,
+                #or 2 if it and all of its associated nodes have been passed through.
+                #a value of 2 means that this node should never be passed through again
 
         else:
             self.position = pos
