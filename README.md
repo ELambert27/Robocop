@@ -1,9 +1,9 @@
 Robocop the gopigo code
 
 authors:
-Austin D
+James Lambert
+Austin Delauney
 Jeff Stroup
 Haoran Ren
-James Lambert
 
-To install: Just add the repo onto the gopigo and run "python3 milestone_4.py"
+To install: Just add the repo onto the gopigo with Raspbian installed and run "python3 milestone_4.py"
